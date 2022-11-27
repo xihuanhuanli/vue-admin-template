@@ -1,4 +1,5 @@
 import { asyncRoutes, constantRoutes } from '@/router'
+import Layout from '@/layout'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -59,6 +60,40 @@ const actions = {
       resolve(accessedRoutes)
     })
   }
+}
+
+/**
+ * 静态路由懒加载
+ * @param view  格式必须为 xxx/xxx 开头不要加斜杠
+ * @returns
+ */
+export const loadView = (view) => {
+  return (resolve) => require([`@/views/${view}.vue`], resolve)
+}
+
+/**
+ * 把从后端查询的菜单数据拼装成路由格式的数据
+ * @param routes
+ * @param data 后端返回的菜单数据
+ */
+export function generaMenu(routes, data) {
+  data.forEach(item => {
+    const menu = {
+      path: item.url,
+      component: item.component === '#' ? Layout : loadView(item.component),
+      hidden: item.status === 0, // 状态为0的隐藏
+      redirect: item.redirect,
+      children: [],
+      name: item.code,
+      meta: item.meta
+    }
+
+    if (item.children) {
+      generaMenu(menu.children, item.children)
+    }
+    routes.push(menu)
+  })
+  return routes
 }
 
 export default {
