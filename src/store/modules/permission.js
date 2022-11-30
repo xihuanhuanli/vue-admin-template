@@ -1,4 +1,4 @@
-import { asyncRoutes, constantRoutes } from '@/router'
+import { constantRoutes } from '@/router'
 import Layout from '@/layout'
 
 /**
@@ -48,14 +48,16 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({ commit }, roles) {
+  generateRoutes({ commit }, menus) {
     return new Promise(resolve => {
-      let accessedRoutes
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      }
+      // let accessedRoutes
+      // if (roles.includes('admin')) {
+      //   accessedRoutes = asyncRoutes || []
+      // } else {
+      //   accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      // }
+      const accessedRoutes = []
+      generaMenu(accessedRoutes, menus)
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })
@@ -68,7 +70,7 @@ const actions = {
  * @returns
  */
 export const loadView = (view) => {
-  return (resolve) => require([`@/views/${view}.vue`], resolve)
+  return (resolve) => require([`@/views/${view}`], resolve)
 }
 
 /**
@@ -81,10 +83,10 @@ export function generaMenu(routes, data) {
     const menu = {
       path: item.url,
       component: item.component === '#' ? Layout : loadView(item.component),
-      hidden: item.status === 0, // 状态为0的隐藏
+      // hidden: item.status === 0, // 状态为0的隐藏
       redirect: item.redirect,
       children: [],
-      name: item.code,
+      name: item.name,
       meta: item.meta
     }
 
